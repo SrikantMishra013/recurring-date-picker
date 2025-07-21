@@ -9,16 +9,18 @@ interface DateRange {
 
 interface RecurrenceState {
   recurrenceType: RecurrenceType;
-  interval: number;
-  weekdays: string[]; // e.g., ['Mon', 'Tue']
+  interval: string;
+  weekdays: string[];
+  monthlyPattern: string;
   dateRange: DateRange;
   updateRecurrence: (key: keyof RecurrenceState, value: any) => void;
 }
 
 export const useRecurrenceStore = create<RecurrenceState>((set) => ({
   recurrenceType: "daily",
-  interval: 1,
+  interval: "1",
   weekdays: [],
+  monthlyPattern: "",
   dateRange: { start: null, end: null },
   updateRecurrence: (key, value) =>
     set((state) => ({ ...state, [key]: value })),

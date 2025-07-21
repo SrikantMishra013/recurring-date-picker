@@ -7,11 +7,13 @@ const CustomOptions = () => {
     interval,
     recurrenceType,
     weekdays: selectedDays,
+    monthlyPattern,
     updateRecurrence,
   } = useRecurrenceStore();
 
   const handleIntervalChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    updateRecurrence("interval", parseInt(e.target.value));
+    if (parseInt(e.target.value) > 10000) return;
+    updateRecurrence("interval", e.target.value);
   };
 
   const toggleWeekday = (day: string) => {
@@ -27,11 +29,12 @@ const CustomOptions = () => {
 
   return (
     <div>
-      <label className="block font-medium mb-1">Every:</label>
+      <label className="mt-4 block font-medium mb-1">Every:</label>
       <input
         type="number"
         min={1}
-        className="border px-3 py-1 rounded w-24 mb-3"
+        maxLength={10000}
+        className="border px-3 py-1 rounded w-88 mb-3"
         value={interval}
         onChange={handleIntervalChange}
       />
@@ -53,6 +56,23 @@ const CustomOptions = () => {
               {day}
             </button>
           ))}
+        </div>
+      )}
+      {recurrenceType === "monthly" && (
+        <div className="mt-4">
+          <label className="block font-medium mb-1">Pattern:</label>
+          <select
+            className="border px-3 py-1 rounded w-full"
+            value={monthlyPattern}
+            onChange={(e) => updateRecurrence("monthlyPattern", e.target.value)}
+          >
+            <option value="">-- Select Pattern --</option>
+            <option value="first-monday">First Monday</option>
+            <option value="second-tuesday">Second Tuesday</option>
+            <option value="third-wednesday">Third Wednesday</option>
+            <option value="fourth-thursday">Fourth Thursday</option>
+            <option value="last-friday">Last Friday</option>
+          </select>
         </div>
       )}
     </div>

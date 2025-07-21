@@ -6,9 +6,9 @@ const DateRangePicker = () => {
   const { dateRange, updateRecurrence } = useRecurrenceStore();
 
   return (
-    <div className="mt-4 space-y-2">
+    <div className="space-y-2">
       <div>
-        <label className="block font-medium">Start Date:</label>
+        <label className="block font-medium mb-1">Start Date:</label>
         <DatePicker
           selected={dateRange.start}
           onChange={(date) =>
@@ -18,7 +18,9 @@ const DateRangePicker = () => {
         />
       </div>
       <div>
-        <label className="block font-medium">End Date (optional):</label>
+        <label className="mt-4 block font-medium mb-1">
+          End Date (optional):
+        </label>
         <DatePicker
           selected={dateRange.end}
           onChange={(date) =>

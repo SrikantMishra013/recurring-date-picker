@@ -1,7 +1,7 @@
 import { useRecurrenceStore } from "@/state/recurrenceStore";
 
 const CalendarPreview = () => {
-  const { recurrenceType, interval, weekdays, dateRange } =
+  const { recurrenceType, interval, weekdays, dateRange, monthlyPattern } =
     useRecurrenceStore();
 
   return (
@@ -10,11 +10,20 @@ const CalendarPreview = () => {
       <ul className="mt-2 text-sm list-disc list-inside">
         <li>Type: {recurrenceType}</li>
         <li>
-          Interval: Every {interval} {recurrenceType}
+          Interval:
+          {interval && (
+            <span>
+              {" "}
+              Every {interval} {recurrenceType}
+            </span>
+          )}
         </li>
         {weekdays.length > 0 && <li>Weekdays: {weekdays.join(", ")}</li>}
-        <li>Start: {dateRange.start?.toLocaleDateString() || "N/A"}</li>
-        <li>End: {dateRange.end?.toLocaleDateString() || "N/A"}</li>
+        {recurrenceType === "monthly" && monthlyPattern && (
+          <li>Pattern: {monthlyPattern.replace("-", " ")}</li>
+        )}
+        <li>Start: {dateRange.start?.toLocaleDateString() || ""}</li>
+        <li>End: {dateRange.end?.toLocaleDateString() || ""}</li>
       </ul>
     </div>
   );

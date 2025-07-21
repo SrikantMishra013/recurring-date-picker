@@ -11,7 +11,7 @@ const RecurrenceSelector = () => {
     <div>
       <label className="block font-medium mb-1">Recurrence:</label>
       <select
-        className="w-full border px-3 py-2 rounded"
+        className=" border px-3 w-104 py-1 rounded"
         value={recurrenceType}
         onChange={handleChange}
       >
