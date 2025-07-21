@@ -29,8 +29,11 @@ const CustomOptions = () => {
 
   return (
     <div>
-      <label className="mt-4 block font-medium mb-1">Every:</label>
+      <label htmlFor="interval-input" className="mt-4 block font-medium mb-1">
+        Every:
+      </label>
       <input
+        id="interval-input"
         type="number"
         min={1}
         maxLength={10000}
@@ -60,8 +63,11 @@ const CustomOptions = () => {
       )}
       {recurrenceType === "monthly" && (
         <div className="mt-4">
-          <label className="block font-medium mb-1">Pattern:</label>
+          <label htmlFor="pattern-select" className="block font-medium mb-1">
+            Pattern:
+          </label>
           <select
+            id="pattern-select"
             className="border px-3 py-1 rounded w-full"
             value={monthlyPattern}
             onChange={(e) => updateRecurrence("monthlyPattern", e.target.value)}

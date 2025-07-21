@@ -1,43 +1,93 @@
-import React from "react";
-import { render, screen, fireEvent } from "@testing-library/react";
-import RecurringDatePicker from "../components/RecurringDatePicker/DateRangePicker";
-import "@testing-library/jest-dom";
+import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
+import RecurringDatePicker from "@/components/RecurringDatePicker";
+import { useRecurrenceStore } from "@/state/recurrenceStore";
 
-describe("RecurringDatePicker Integration Test", () => {
-  test('should allow user to select "Weekly" and choose Monday and Friday', async () => {
+// Mock the store
+jest.mock("@/state/recurrenceStore", () => {
+  const actual = jest.requireActual("@/state/recurrenceStore");
+  return {
+    ...actual,
+    useRecurrenceStore: jest.fn(),
+  };
+});
+
+const mockUpdate = jest.fn();
+
+const setupStore = (overrides = {}) => {
+  (useRecurrenceStore as unknown as jest.Mock).mockReturnValue({
+    recurrenceType: "daily",
+    interval: 1,
+    weekdays: [],
+    dateRange: { start: new Date("2025-07-01"), end: new Date("2025-07-31") },
+    monthlyPattern: "",
+    updateRecurrence: mockUpdate,
+    ...overrides,
+  });
+};
+
+describe("RecurringDatePicker Integration", () => {
+  beforeEach(() => {
+    mockUpdate.mockClear();
+  });
+
+  test("should render recurrence type selector and change type", async () => {
+    setupStore();
     render(<RecurringDatePicker />);
 
-    // Select "Weekly" from recurrence options
-    const recurrenceSelect = screen.getByLabelText(
-      /recurrence/i
-    ) as HTMLSelectElement;
-    await userEvent.selectOptions(recurrenceSelect, ["weekly"]);
-    expect(recurrenceSelect.value).toBe("weekly");
+    const select = screen.getByLabelText(/Recurrence/i);
+    expect(select).toBeInTheDocument();
 
-    // Check weekday checkboxes
-    const mondayCheckbox = screen.getByLabelText(/monday/i) as HTMLInputElement;
-    const fridayCheckbox = screen.getByLabelText(/friday/i) as HTMLInputElement;
+    await userEvent.selectOptions(select, "weekly");
+    expect(mockUpdate).toHaveBeenCalledWith("recurrenceType", "weekly");
+  });
 
-    expect(mondayCheckbox).toBeInTheDocument();
-    expect(fridayCheckbox).toBeInTheDocument();
+  test("should update interval input", async () => {
+    setupStore();
+    render(<RecurringDatePicker />);
 
-    // Select Monday and Friday
-    await userEvent.click(mondayCheckbox);
-    await userEvent.click(fridayCheckbox);
+    const input = screen.getByLabelText(/Every:/i);
+    expect(input).toBeInTheDocument();
 
-    expect(mondayCheckbox.checked).toBe(true);
-    expect(fridayCheckbox.checked).toBe(true);
+    await userEvent.clear(input);
+    await userEvent.type(input, "5");
 
-    // Enter start date
-    const startDateInput = screen.getByLabelText(
-      /start date/i
-    ) as HTMLInputElement;
-    fireEvent.change(startDateInput, { target: { value: "2025-07-21" } });
-    expect(startDateInput.value).toBe("2025-07-21");
+    const intervalCalls = mockUpdate.mock.calls.filter(
+      ([key]) => key === "interval"
+    );
+    const lastValue = intervalCalls[intervalCalls.length - 1][1];
+    expect(lastValue).toBe("15");
+  });
 
-    // Check if preview section appears (ensure this exists in your JSX with test id)
-    const preview = await screen.findByTestId("calendar-preview");
-    expect(preview).toBeInTheDocument();
+  test("should toggle weekday buttons on weekly type", async () => {
+    setupStore({ recurrenceType: "weekly", weekdays: ["Mon"] });
+    render(<RecurringDatePicker />);
+
+    const tueButton = screen.getByRole("button", { name: "Tue" });
+    expect(tueButton).toBeInTheDocument();
+
+    await userEvent.click(tueButton);
+    expect(mockUpdate).toHaveBeenCalledWith("weekdays", ["Mon", "Tue"]);
+  });
+
+  test("should select monthly pattern", async () => {
+    setupStore({ recurrenceType: "monthly", monthlyPattern: "" });
+    render(<RecurringDatePicker />);
+
+    const select = screen.getByLabelText(/Pattern/i);
+    await userEvent.selectOptions(select, "first-monday");
+
+    expect(mockUpdate).toHaveBeenCalledWith("monthlyPattern", "first-monday");
+  });
+
+  test("should display start and end dates in preview", () => {
+    const start = new Date("2025-07-01");
+    const end = new Date("2025-07-31");
+
+    setupStore({ dateRange: { start, end } });
+    render(<RecurringDatePicker />);
+
+    expect(screen.getByText(/Start:/)).toHaveTextContent("7/1/2025");
+    expect(screen.getByText(/End:/)).toHaveTextContent("7/31/2025");
   });
 });

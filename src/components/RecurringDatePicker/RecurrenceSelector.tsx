@@ -9,8 +9,11 @@ const RecurrenceSelector = () => {
 
   return (
     <div>
-      <label className="block font-medium mb-1">Recurrence:</label>
+      <label htmlFor="recurrence-select" className="block font-medium mb-1">
+        Recurrence:
+      </label>
       <select
+        id="recurrence-select"
         className=" border px-3 w-104 py-1 rounded"
         value={recurrenceType}
         onChange={handleChange}

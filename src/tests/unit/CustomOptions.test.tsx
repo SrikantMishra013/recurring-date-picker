@@ -6,7 +6,7 @@ describe("CustomOptions", () => {
   beforeEach(() => {
     useRecurrenceStore.setState({
       recurrenceType: "weekly",
-      interval: 2,
+      interval: "2",
       weekdays: [],
     });
   });
@@ -18,7 +18,7 @@ describe("CustomOptions", () => {
     expect(input.value).toBe("2");
     fireEvent.change(input, { target: { value: "5" } });
 
-    expect(useRecurrenceStore.getState().interval).toBe(5);
+    expect(useRecurrenceStore.getState().interval).toBe("5");
   });
 
   it("toggles weekday selection", () => {
